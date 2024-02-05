@@ -7,7 +7,7 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-mongo_uri = 'mongodb+srv://rafyeffendy772:65798834@jumpheightrecord.tlt343i.mongodb.net/'
+mongo_uri = []
 
 database_name = 'test'
 collection_name = 'revisi' 
