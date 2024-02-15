@@ -8,9 +8,9 @@ from datetime import datetime
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
 
-mongo_uri = []
-database_name = 'test'
-collection_name = 'revisi' 
+mongo_uri = 'mongodb://localhost:27017/'
+database_name = 'protel'
+collection_name = 'test' 
 
 client = MongoClient(mongo_uri)
 db = client[database_name]
@@ -90,4 +90,4 @@ def toindex():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(host=[], port=5000)
+    app.run(host='10.3.131.187', port=5000)
