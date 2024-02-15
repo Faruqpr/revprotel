@@ -40,6 +40,21 @@
             bottom: 10px;
         }
 
+        #kembaliBtn {
+            background-color: #4CAF50;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 20px; 
+        }
+
+        #kembaliBtn:hover {
+            background-color: lightgreen;
+        }
+
         #deleteDataBtn {
             background-color: #dc3545;
             color: #fff;
@@ -72,37 +87,29 @@
 
         table {
             width: 100%;
-            max-width: 600px; 
-            border-collapse: collapse; 
-            margin-top: 20px; 
+            max-width: 600px;
+            border-collapse: collapse;
+            margin-top: 20px;
         }
 
         th {
-            background-color: #4CAF50; 
-            color: white; 
-            text-align: center; 
-            padding: 12px; 
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            padding: 12px;
             border: 1px solid #000;
         }
 
         td {
-            border: 1px solid #000; 
-            padding: 8px; 
+            border: 1px solid #000;
+            padding: 8px;
             text-align: center;
         }
 
-        tr:nth-child(odd) {
-            background-color: #f9f9f9; /* Warna latar belakang untuk baris ganjil */
-        }
-
-        /* Gaya untuk baris tabel genap */
-        tr:nth-child(even) {
-            background-color: #ffffff; /* Warna latar belakang untuk baris genap */
-        }
         #data-history-table tbody {
             display: block;
-            max-height: 200px; /* Sesuaikan tinggi sesuai kebutuhan */
-            overflow-y: auto;
+            max-height: 200px;
+            overflow-x: auto;
         }
 
         #data-history-table thead, #data-history-table tbody tr {
@@ -112,13 +119,21 @@
         }
 
         #data-history-table thead {
-            width: calc(100% - 15px); /* Kurangi lebar untuk scrollbar */
+            width: 100%;
+        }
+
+        tr:nth-child(odd) {
+            background-color: #D9D9D9; 
+        }
+
+        tr:nth-child(even) {
+            background-color: #ffffffad; 
         }
     </style>
 </head>
 <body>
     <div class="header">
-        <span class="title">VERJAS ITS</span>
+        <span class="title">VERJAS ITS - History</span>
     </div>
 
     <table id="data-history-table">
@@ -126,50 +141,43 @@
             <tr>
                 <th>Hasil Sensor (cm)</th>
                 <th>Hasil Kamera (cm)</th>
+                <!-- <th>Timestamp</th> -->
             </tr>
         </thead>
         <tbody>
-            
+            <!-- Data will be dynamically inserted here using JavaScript -->
         </tbody>
     </table>
 
     <di class="button-container">
-        <button id="kembaliBtn" onclick="toindex()">Kembali</button>
+        <button id="kembaliBtn" onclick="toindex()">Back</button>
         <!-- <button id="exportDataBtn" onclick="exportData()">Export Data to CSV</button> -->
         <button id="deleteDataBtn" onclick="deleteData()">Delete Data</button>
     </di>
 
     <script>
-         document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             fetch('/get_ultrasonic_data')
-            .then(response => response.json())
-            .then(data => {
-                // Tabel untuk data terbaru
-                const dataTableBody = document.getElementById('data-table').getElementsByTagName('tbody')[0];
-                const dataHistoryTableBody = document.getElementById('data-history-table').getElementsByTagName('tbody')[0];
+                .then(response => response.json())
+                .then(data => {
+                    // Check if data is available
+                    if (data.length > 0) {
+                        const historyTableBody = document.getElementById('data-history-table').getElementsByTagName('tbody')[0];
 
-                // Pastikan hanya menampilkan 1 data terbaru di tabel pertama
-                const latestData = data.slice(0, 1);
-                latestData.forEach((item) => {
-                    const row = dataTableBody.insertRow();
-                    const cellSensorData = row.insertCell(0);
-                    const cellVisualData = row.insertCell(1);
-                    
-                    cellSensorData.textContent = item.UltrasonicSensorData + ' cm';
-                    cellVisualData.textContent = item.UltrasonicVisualData + ' cm';
-                });
+                        // Iterate through all historical data and insert into the table
+                        data.forEach(item => {
+                            const row = historyTableBody.insertRow();
+                            const cellSensorData = row.insertCell(0);
+                            const cellVisualData = row.insertCell(1);
+                            // const cellTimestamp = row.insertCell(2);
 
-                // Menampilkan semua data di tabel history
-                data.forEach((item) => {
-                    const row = dataHistoryTableBody.insertRow();
-                    const cellSensorData = row.insertCell(0);
-                    const cellVisualData = row.insertCell(1);
-                    
-                    cellSensorData.textContent = item.UltrasonicSensorData + ' cm';
-                    cellVisualData.textContent = item.UltrasonicVisualData + ' cm';
-                });
-            })
-            .catch(error => console.error('Error fetching ultrasonic data:', error));
+                            cellSensorData.textContent = item.UltrasonicSensorData;
+                            cellVisualData.textContent = item.UltrasonicVisualData;
+                            // cellTimestamp.textContent = item.timestamp;
+                        });
+                    }
+                })
+                .catch(error => console.error('Error fetching ultrasonic data:', error));
         });
 
         function exportData() {
