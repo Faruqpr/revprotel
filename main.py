@@ -14,11 +14,11 @@ collection_name = 'test'
 
 client = MongoClient(mongo_uri)
 db = client[database_name]
-revisi_collection = db[collection_name]  
+collection = db[collection_name]  
 
 def insert_ultrasonic_data(visual_data, sensor_data):
     timestamp = datetime.utcnow()
-    revisi_collection.insert_one({
+    collection.insert_one({
         'UltrasonicVisualData': visual_data,
         'UltrasonicSensorData': sensor_data,
         'timestamp': timestamp
@@ -49,7 +49,16 @@ def insert_ultrasonic_data_route():
 @app.route('/get_ultrasonic_data')
 def get_ultrasonic_data():
     try:
-        data = list(revisi_collection.find({}, {'_id': 0, 'UltrasonicVisualData': 1, 'UltrasonicSensorData': 1, 'timestamp': 1}).sort('timestamp', DESCENDING))
+        data = list(collection.find({}, {'_id': 0, 'UltrasonicVisualData': 1, 'UltrasonicSensorData': 1, 'timestamp': 1}).sort('timestamp', DESCENDING))
+        return jsonify(data)
+    except Exception as e:
+        print(e)
+        return jsonify({'error': 'Internal Server Error'}), 500
+
+@app.route('/get_history_data')
+def get_history_data():
+    try:
+        data = list(collection.find({}, {'_id': 0, 'UltrasonicVisualData': 1, 'UltrasonicSensorData': 1, 'timestamp': 1}))
         return jsonify(data)
     except Exception as e:
         print(e)
@@ -57,14 +66,14 @@ def get_ultrasonic_data():
 
 @app.route('/delete_data', methods=['POST'])
 def delete_data():
-    revisi_collection.delete_many({})
+    collection.delete_many({})
     return jsonify({'status': 'success', 'message': 'Data deleted successfully'})
 
 @app.route('/export_data')
 def export_data():
     si = StringIO()
     cw = csv.writer(si)
-    data_cursor = revisi_collection.find({})
+    data_cursor = collection.find({})
     data_list = list(data_cursor)
     cw.writerow([str(key) for key in data_list[0].keys()])
 
@@ -90,4 +99,4 @@ def toindex():
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
-    app.run(host='10.3.131.187', port=5000)
+    app.run(host='10.3.131.43', port=5000)
