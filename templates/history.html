@@ -108,7 +108,7 @@
 
         #data-history-table tbody {
             display: block;
-            max-height: 200px;
+            /* max-height: 200px; */
             overflow-x: auto;
         }
 
@@ -119,8 +119,14 @@
         }
 
         #data-history-table thead {
-            width: 100%;
+            max-width: 600px;
         }
+
+        .kolom-nomor {
+            width: 50px; /* Atau sesuaikan lebar sesuai kebutuhan */
+            max-width: 50px; /* Ini memastikan kolom tidak melebar lebih dari 50px */
+        }
+
 
         tr:nth-child(odd) {
             background-color: #D9D9D9; 
@@ -139,6 +145,7 @@
     <table id="data-history-table">
         <thead>
             <tr>
+                <th class="kolom-nomor">No</th>
                 <th>Hasil Sensor (cm)</th>
                 <th>Hasil Kamera (cm)</th>
                 <!-- <th>Timestamp</th> -->
@@ -149,36 +156,40 @@
         </tbody>
     </table>
 
+    <h3>*Data diurutkan dari yang pertama hingga yang terakhir</h3>
+
     <di class="button-container">
         <button id="kembaliBtn" onclick="toindex()">Back</button>
         <!-- <button id="exportDataBtn" onclick="exportData()">Export Data to CSV</button> -->
         <button id="deleteDataBtn" onclick="deleteData()">Delete Data</button>
     </di>
 
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            fetch('/get_ultrasonic_data')
+            fetch('/get_history_data')
                 .then(response => response.json())
                 .then(data => {
-                    // Check if data is available
                     if (data.length > 0) {
                         const historyTableBody = document.getElementById('data-history-table').getElementsByTagName('tbody')[0];
-
                         // Iterate through all historical data and insert into the table
-                        data.forEach(item => {
+                        data.forEach((item, index) => {
                             const row = historyTableBody.insertRow();
-                            const cellSensorData = row.insertCell(0);
-                            const cellVisualData = row.insertCell(1);
-                            // const cellTimestamp = row.insertCell(2);
+                            const cellNumber = row.insertCell(0); // Sel untuk nomor
+                            const cellSensorData = row.insertCell(1);
+                            const cellVisualData = row.insertCell(2);
 
+                            cellNumber.classList.add('kolom-nomor'); // Tambahkan kelas ke sel nomor
+                            cellNumber.textContent = index + 1;
                             cellSensorData.textContent = item.UltrasonicSensorData;
                             cellVisualData.textContent = item.UltrasonicVisualData;
-                            // cellTimestamp.textContent = item.timestamp;
                         });
                     }
                 })
                 .catch(error => console.error('Error fetching ultrasonic data:', error));
         });
+
+
 
         function exportData() {
         window.location.href = '/export_data';
